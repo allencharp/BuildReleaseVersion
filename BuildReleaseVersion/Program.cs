@@ -17,33 +17,35 @@ namespace BuildReleaseVersion
 				return;
 			}
 
-			IList<IChange> files = new List<IChange>();
+			IList<AssemblyFile> files = new List<AssemblyFile>();
 			ChangeVersion version = new ChangeVersion(args[1]);
-			foreach (var file in files)
+			foreach (AssemblyFile file in files)
 			{
-				file.ChangeVersion(version);
+				System.Threading.ThreadPool.QueueUserWorkItem(delegate {
+					file.ChangeVersion(version);
+				}); 
 			}
 		}
 	}
-	interface IChange
+	abstract class AssemblyFile
 	{
-		void ChangeVersion(IVisitor visitor);
+		public virtual void ChangeVersion(IVisitor visitor) { }
 	}
 	interface IVisitor
 	{
 		void ChangeAssemblyVersion(CSharpAssemblyFile file);
 		void ChangeAssemblyVersion(CppAssemblyFile file);
 	}
-	class CSharpAssemblyFile : IChange
+	class CSharpAssemblyFile : AssemblyFile
 	{
-		public void ChangeVersion(IVisitor visitor)
+		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
 		}
 	}
-	class CppAssemblyFile : IChange
+	class CppAssemblyFile : AssemblyFile
 	{
-		public void ChangeVersion(IVisitor visitor)
+		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
 		}
