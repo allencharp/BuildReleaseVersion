@@ -36,6 +36,7 @@ namespace BuildReleaseVersion
 			{
 				HandleAssemlyFile(verNum);
 			});
+
 			Console.ReadLine();
 		}
 
@@ -49,14 +50,18 @@ namespace BuildReleaseVersion
 
 					AssemblyFile file = filesQueue.Dequeue();
 
+					// we need to break the while, Procedure will enqueue a null
 					if (file == null)
+					{
+						Console.WriteLine("Finished !");
 						break;
-
+					}
 					ThreadPool.QueueUserWorkItem(delegate
 					{
 						file.ChangeVersion(version);
 					});
 				}
+				single.Reset();
 			}
 		}
 
@@ -99,6 +104,7 @@ namespace BuildReleaseVersion
 			}
 		}
 	}
+
 	abstract class AssemblyFile
 	{
 		public virtual string filepath { get; set; }
