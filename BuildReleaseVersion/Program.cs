@@ -11,6 +11,7 @@ namespace BuildReleaseVersion
 	{
 		static void Main(string[] args)
 		{
+			// Command: BuildReleaseVersion 4.0.1001.2 C:\Source\ABSF
 			if (args.Length != 2)
 			{
 				Console.WriteLine("Please input the correct path and version number");
@@ -18,26 +19,29 @@ namespace BuildReleaseVersion
 			}
 
 			IList<AssemblyFile> files = new List<AssemblyFile>();
-			ChangeVersion version = new ChangeVersion(args[1]);
+			ChangeVersion version = new ChangeVersion(args[0], args[1]);
 			foreach (AssemblyFile file in files)
 			{
 				System.Threading.ThreadPool.QueueUserWorkItem(delegate {
 					file.ChangeVersion(version);
-				}); 
+				});
 			}
 		}
 	}
 	abstract class AssemblyFile
 	{
+		protected string filepath { get; set; }
 		public virtual void ChangeVersion(IVisitor visitor) { }
 	}
 	interface IVisitor
 	{
 		void ChangeAssemblyVersion(CSharpAssemblyFile file);
 		void ChangeAssemblyVersion(CppAssemblyFile file);
+		void ChangeAssemblyVersion(BetaAssemblyFile file);
 	}
 	class CSharpAssemblyFile : AssemblyFile
 	{
+		public override string filepath { get; set; }
 		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
@@ -45,6 +49,15 @@ namespace BuildReleaseVersion
 	}
 	class CppAssemblyFile : AssemblyFile
 	{
+		public override string filepath { get; set; }
+		public override void ChangeVersion(IVisitor visitor)
+		{
+			visitor.ChangeAssemblyVersion(this);
+		}
+	}
+	class BetaAssemblyFile : AssemblyFile
+	{
+		public override string filepath { get; set; }
 		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
@@ -54,7 +67,7 @@ namespace BuildReleaseVersion
 	class ChangeVersion : IVisitor
 	{
 		private string v;
-		public ChangeVersion(string version)
+		public ChangeVersion(string version, string path)
 		{
 			this.v = version;
 		}
