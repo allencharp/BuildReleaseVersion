@@ -3,34 +3,89 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BuildReleaseVersion
 {
 	class Program
 	{
+		private static Queue<AssemblyFile> filesQueue = new Queue<AssemblyFile>();
+
+		private static ManualResetEvent single = new ManualResetEvent(true);
+
 		static void Main(string[] args)
 		{
-			// Command: BuildReleaseVersion 4.0.1001.2 C:\Source\ABSF
+			// Command: BuildReleaseVersion.exe 4.0.1001.2 C:\Source\ABSF
 			if (args.Length != 2)
 			{
 				Console.WriteLine("Please input the correct path and version number");
 				return;
 			}
+			//TODO add some checks about the arguments....
 
-			IList<AssemblyFile> files = new List<AssemblyFile>();
-			ChangeVersion version = new ChangeVersion(args[0], args[1]);
-			foreach (AssemblyFile file in files)
+			string verNum = args[0];
+			string proLoc = args[1];
+
+			ThreadPool.QueueUserWorkItem(delegate
 			{
-				System.Threading.ThreadPool.QueueUserWorkItem(delegate {
-					file.ChangeVersion(version);
-				});
+				FindAssemblyFiles(proLoc);
+			});
+
+			single.WaitOne();
+			{
+				while (filesQueue.Count > 0)
+				{
+					ChangeVersion version = new ChangeVersion(verNum);
+
+					AssemblyFile file = filesQueue.Dequeue();
+					ThreadPool.QueueUserWorkItem(delegate
+					{
+						file.ChangeVersion(version);
+					});
+				}
+			}
+			Console.ReadLine();
+		}
+
+		public static void FindAssemblyFiles(string path)
+		{
+			if (File.Exists(path))
+			{
+				ProcessFile(path);
+			}
+			else if (Directory.Exists(path))
+			{
+				ProcessDirectory(path);
+			}
+
+			// Finish the search, send a single
+			single.Set();
+		}
+
+		public static void ProcessDirectory(string targetDirectory)
+		{
+			string[] fileEntries = Directory.GetFiles(targetDirectory);
+			foreach (string fileName in fileEntries.Where(name => name.Contains("Assembly")))
+				ProcessFile(fileName);
+
+			string[] subdirectoryEntries = Directory.GetDirectories(targetDirectory);
+			foreach (string subdirectory in subdirectoryEntries)
+				ProcessDirectory(subdirectory);
+		}
+
+		public static void ProcessFile(string file)
+		{
+			if (file.Contains("Assembly"))
+			{
+				AssemblyFile assembly = Factory.GetFile(file);
+				filesQueue.Enqueue(assembly);
 			}
 		}
 	}
 	abstract class AssemblyFile
 	{
-		protected string filepath { get; set; }
+		public virtual string filepath { get; set; }
 		public virtual void ChangeVersion(IVisitor visitor) { }
 	}
 	interface IVisitor
@@ -41,7 +96,10 @@ namespace BuildReleaseVersion
 	}
 	class CSharpAssemblyFile : AssemblyFile
 	{
-		public override string filepath { get; set; }
+		public CSharpAssemblyFile(string path)
+		{
+			this.filepath = path;
+		}
 		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
@@ -49,7 +107,10 @@ namespace BuildReleaseVersion
 	}
 	class CppAssemblyFile : AssemblyFile
 	{
-		public override string filepath { get; set; }
+		public CppAssemblyFile(string path)
+		{
+			this.filepath = path;
+		}
 		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
@@ -57,7 +118,10 @@ namespace BuildReleaseVersion
 	}
 	class BetaAssemblyFile : AssemblyFile
 	{
-		public override string filepath { get; set; }
+		public BetaAssemblyFile(string path)
+		{
+			this.filepath = path;
+		}
 		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
@@ -67,7 +131,7 @@ namespace BuildReleaseVersion
 	class ChangeVersion : IVisitor
 	{
 		private string v;
-		public ChangeVersion(string version, string path)
+		public ChangeVersion(string version)
 		{
 			this.v = version;
 		}
@@ -76,6 +140,10 @@ namespace BuildReleaseVersion
 			Console.WriteLine("");
 		}
 		public void ChangeAssemblyVersion(CppAssemblyFile file)
+		{
+			Console.WriteLine("");
+		}
+		public void ChangeAssemblyVersion(BetaAssemblyFile file)
 		{
 			Console.WriteLine("");
 		}
