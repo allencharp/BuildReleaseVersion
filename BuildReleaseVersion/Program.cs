@@ -32,23 +32,35 @@ namespace BuildReleaseVersion
 				FindAssemblyFiles(proLoc);
 			});
 
-			single.WaitOne();
+			ThreadPool.QueueUserWorkItem(delegate
 			{
-				while (filesQueue.Count > 0)
+				HandleAssemlyFile(verNum);
+			});
+			Console.ReadLine();
+		}
+
+		private static void HandleAssemlyFile(string verNum)
+		{
+			while (true)
+			{
+				single.WaitOne();
 				{
-					ChangeVersion version = new ChangeVersion(verNum);
+					ChangeVersionVisitor version = new ChangeVersionVisitor(verNum);
 
 					AssemblyFile file = filesQueue.Dequeue();
+
+					if (file == null)
+						break;
+
 					ThreadPool.QueueUserWorkItem(delegate
 					{
 						file.ChangeVersion(version);
 					});
 				}
 			}
-			Console.ReadLine();
 		}
 
-		public static void FindAssemblyFiles(string path)
+		private static void FindAssemblyFiles(string path)
 		{
 			if (File.Exists(path))
 			{
@@ -59,11 +71,11 @@ namespace BuildReleaseVersion
 				ProcessDirectory(path);
 			}
 
-			// Finish the search, send a single
-			single.Set();
+			// enqueue null to tell stop the consumer.
+			filesQueue.Enqueue(null);
 		}
 
-		public static void ProcessDirectory(string targetDirectory)
+		private static void ProcessDirectory(string targetDirectory)
 		{
 			string[] fileEntries = Directory.GetFiles(targetDirectory);
 			foreach (string fileName in fileEntries.Where(name => name.Contains("Assembly")))
@@ -74,12 +86,16 @@ namespace BuildReleaseVersion
 				ProcessDirectory(subdirectory);
 		}
 
-		public static void ProcessFile(string file)
+		private static void ProcessFile(string file)
 		{
 			if (file.Contains("Assembly"))
 			{
 				AssemblyFile assembly = Factory.GetFile(file);
-				filesQueue.Enqueue(assembly);
+				if (assembly != null)
+				{
+					filesQueue.Enqueue(assembly);
+					single.Set();
+				}
 			}
 		}
 	}
@@ -88,12 +104,7 @@ namespace BuildReleaseVersion
 		public virtual string filepath { get; set; }
 		public virtual void ChangeVersion(IVisitor visitor) { }
 	}
-	interface IVisitor
-	{
-		void ChangeAssemblyVersion(CSharpAssemblyFile file);
-		void ChangeAssemblyVersion(CppAssemblyFile file);
-		void ChangeAssemblyVersion(BetaAssemblyFile file);
-	}
+	
 	class CSharpAssemblyFile : AssemblyFile
 	{
 		public CSharpAssemblyFile(string path)
@@ -125,27 +136,6 @@ namespace BuildReleaseVersion
 		public override void ChangeVersion(IVisitor visitor)
 		{
 			visitor.ChangeAssemblyVersion(this);
-		}
-	}
-
-	class ChangeVersion : IVisitor
-	{
-		private string v;
-		public ChangeVersion(string version)
-		{
-			this.v = version;
-		}
-		public void ChangeAssemblyVersion(CSharpAssemblyFile file)
-		{
-			Console.WriteLine("");
-		}
-		public void ChangeAssemblyVersion(CppAssemblyFile file)
-		{
-			Console.WriteLine("");
-		}
-		public void ChangeAssemblyVersion(BetaAssemblyFile file)
-		{
-			Console.WriteLine("");
 		}
 	}
 }

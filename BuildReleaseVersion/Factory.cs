@@ -14,10 +14,8 @@ namespace BuildReleaseVersion
 				return new CppAssemblyFile(file);
 			else if (IsCharpAssemblyFile(file))
 				return new CSharpAssemblyFile(file);
-			else if (IsCommonAssemblyFile(file))
+			else 
 				return new BetaAssemblyFile(file);
-
-			return null;
 		}
 
 		public static bool IsCppAssemblyFile(string file)
