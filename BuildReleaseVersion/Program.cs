@@ -27,12 +27,13 @@ namespace BuildReleaseVersion
 			string verNum = args[0];
 			string proLoc = args[1];
 
+			// Use single to create a Producer and Consumer to 
+			// handle the assemble files
 			ThreadPool.QueueUserWorkItem(delegate
 			{
 				FindAssemblyFiles(proLoc);
 			});
-
-			ThreadPool.QueueUserWorkItem(delegate
+			ThreadPool.QueueUserWorkItem(delegate 
 			{
 				HandleAssemlyFile(verNum);
 			});
@@ -50,7 +51,7 @@ namespace BuildReleaseVersion
 
 					AssemblyFile file = filesQueue.Dequeue();
 
-					// we need to break the while, Procedure will enqueue a null
+					// we need to break the while
 					if (file == null)
 					{
 						Console.WriteLine("Finished !");
@@ -78,6 +79,7 @@ namespace BuildReleaseVersion
 
 			// enqueue null to tell stop the consumer.
 			filesQueue.Enqueue(null);
+			single.Set();
 		}
 
 		private static void ProcessDirectory(string targetDirectory)
@@ -95,10 +97,10 @@ namespace BuildReleaseVersion
 		{
 			if (file.Contains("Assembly"))
 			{
-				AssemblyFile assembly = Factory.GetFile(file);
-				if (assembly != null)
+				AssemblyFile assemblyFile = Factory.GetFile(file);
+				if (assemblyFile != null)
 				{
-					filesQueue.Enqueue(assembly);
+					filesQueue.Enqueue(assemblyFile);
 					single.Set();
 				}
 			}
