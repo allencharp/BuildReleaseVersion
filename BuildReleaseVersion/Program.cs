@@ -12,7 +12,7 @@ namespace BuildReleaseVersion
 	{
 		private static Queue<AssemblyFile> filesQueue = new Queue<AssemblyFile>();
 
-		private static ManualResetEvent single = new ManualResetEvent(true);
+		private static ManualResetEvent single = new ManualResetEvent(false);
 
 		static void Main(string[] args)
 		{

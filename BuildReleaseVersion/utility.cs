@@ -73,9 +73,13 @@ namespace BuildReleaseVersion
 				}
 				reader.Close();
 
+
 				using(TextWriter tw = new StreamWriter(file, false))
 				{
-					tw.Write(lines);
+					for (int i = 0; i < lines.Length; i++)
+					{
+						tw.Write(lines[i]);
+					}
 					tw.Close();
 				};
 			}
