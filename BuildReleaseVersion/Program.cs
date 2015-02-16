@@ -40,7 +40,7 @@ namespace BuildReleaseVersion
 
 			Console.ReadLine();
 		}
-
+		 
 		private static void HandleAssemlyFile(string verNum)
 		{
 			while (true)

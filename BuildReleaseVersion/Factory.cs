@@ -23,16 +23,21 @@ namespace BuildReleaseVersion
 
 		public static bool IsCppAssemblyFile(string file)
 		{
-			
+			if (file.Contains("AssemblyInfo.cpp"))
+				return true;
 
 			return false;
 		}
 		public static bool IsCharpAssemblyFile(string file)
 		{
+			if (file.Contains("CommonAssemblyInfo.cs"))
+				return true;
 			return false;
 		}
 		public static bool IsCommonAssemblyFile(string file)
 		{
+			if (file.Contains("AssemblyInfo.cs"))
+				return true;
 			return false;
 		}
 	}

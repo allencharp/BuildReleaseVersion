@@ -22,15 +22,25 @@ namespace BuildReleaseVersion
 		}
 		public void ChangeAssemblyVersion(CSharpAssemblyFile file)
 		{
-			Console.WriteLine("");
+			string cut = Utility.GetCSharpCutVersion(this.v);
+
+			Utility.ReplaceVersion(FileType.CommonAssemblyInfoCS, file.filepath, cut);
+
+			Utility.PrintFile(file.filepath);
 		}
 		public void ChangeAssemblyVersion(CppAssemblyFile file)
 		{
-			Console.WriteLine("");
+			Utility.ReplaceVersion(FileType.AssemblyInfoCpp, file.filepath, this.v);
+
+			Utility.PrintFile(file.filepath);
 		}
 		public void ChangeAssemblyVersion(BetaAssemblyFile file)
 		{
-			Console.WriteLine("");
+			string beta = Utility.GetBetaInfo(this.v);
+
+			Utility.ReplaceVersion(FileType.AssemblyInfoCS, file.filepath, beta);
+			
+			Utility.PrintFile(file.filepath);
 		}
 	}
 }
