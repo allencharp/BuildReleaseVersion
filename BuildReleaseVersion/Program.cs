@@ -31,7 +31,7 @@ namespace BuildReleaseVersion
 			// handle the assemble files
 			ThreadPool.QueueUserWorkItem(delegate
 			{
-				FindAssemblyFiles(proLoc);
+				FindAssemblyFiles(proLoc, true);
 			});
 			ThreadPool.QueueUserWorkItem(delegate 
 			{
@@ -66,7 +66,7 @@ namespace BuildReleaseVersion
 			}
 		}
 
-		private static void FindAssemblyFiles(string path)
+		private static void FindAssemblyFiles(string path, bool IsFinished=false)
 		{
 			if (File.Exists(path))
 			{
@@ -77,9 +77,12 @@ namespace BuildReleaseVersion
 				ProcessDirectory(path);
 			}
 
-			// enqueue null to tell stop the consumer.
-			filesQueue.Enqueue(null);
-			single.Set();
+			if (IsFinished)
+			{
+				// enqueue null to tell stop the consumer.
+				filesQueue.Enqueue(null);
+				single.Set();
+			}
 		}
 
 		private static void ProcessDirectory(string targetDirectory)
@@ -101,6 +104,7 @@ namespace BuildReleaseVersion
 				if (assemblyFile != null)
 				{
 					filesQueue.Enqueue(assemblyFile);
+					Utility.PrintFile(assemblyFile.filepath);
 					single.Set();
 				}
 			}

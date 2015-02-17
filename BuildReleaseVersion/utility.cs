@@ -46,7 +46,7 @@ namespace BuildReleaseVersion
 			{
 				string stream = reader.ReadToEnd();
 				
-				string[] lines = stream.Split(new char[] { '\r', '\n' });
+				string[] lines = stream.Split(new char[] {'\n'});
 
 				for (int i = 0; i < lines.Length; i ++)
 				{
@@ -78,7 +78,7 @@ namespace BuildReleaseVersion
 				{
 					for (int i = 0; i < lines.Length; i++)
 					{
-						tw.Write(lines[i]);
+						tw.Write(lines[i]+"\n");
 					}
 					tw.Close();
 				};
