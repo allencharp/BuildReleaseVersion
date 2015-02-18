@@ -46,7 +46,7 @@ namespace BuildReleaseVersion
 		{
 			while (true)
 			{
-				single.WaitOne();
+				if(filesQueue.Count>0 && single.WaitOne())
 				{
 					ChangeVersionVisitor version = new ChangeVersionVisitor(verNum);
 
@@ -63,7 +63,6 @@ namespace BuildReleaseVersion
 						file.ChangeVersion(version);
 					});
 				}
-				single.Reset();
 			}
 		}
 
