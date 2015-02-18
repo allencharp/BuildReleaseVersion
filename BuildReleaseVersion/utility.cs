@@ -30,6 +30,24 @@ namespace BuildReleaseVersion
 			return builder.ToString();
 		}
 
+		// Command: BuildReleaseVersion.exe 4.0.1001.2 C:\Source\ABSF
+		public static bool CheckArguments(string[] args)
+		{
+			if (args.Length != 2)
+			{
+				return false;
+			}
+			if(args[0].Count(dot => dot == '.') != 3)
+			{
+				return false;
+			}
+			if (!Directory.Exists(args[1]))
+			{
+				return false;
+			}
+			return true;
+		}
+
 		public static void PrintFile(string file)
 		{
 			Console.WriteLine(file);

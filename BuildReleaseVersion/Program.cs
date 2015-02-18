@@ -17,12 +17,13 @@ namespace BuildReleaseVersion
 		static void Main(string[] args)
 		{
 			// Command: BuildReleaseVersion.exe 4.0.1001.2 C:\Source\ABSF
-			if (args.Length != 2)
+			if (!Utility.CheckArguments(args))
 			{
-				Console.WriteLine("Please input the correct path and version number");
+				Console.WriteLine("Please input the correct cut version and source location");
+				Console.WriteLine("Sample as: BuildReleaseVersion.exe 4.0.1001.2 C:\\Source\\ABSF");
+				Console.ReadLine();
 				return;
 			}
-			//TODO add some checks about the arguments....
 
 			string verNum = args[0];
 			string proLoc = args[1];
