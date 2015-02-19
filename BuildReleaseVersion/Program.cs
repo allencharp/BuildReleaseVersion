@@ -12,7 +12,7 @@ namespace BuildReleaseVersion
 	{
 		private static Queue<AssemblyFile> filesQueue = new Queue<AssemblyFile>();
 
-		private static ManualResetEvent single = new ManualResetEvent(false);
+		//private static ManualResetEvent single = new ManualResetEvent(false);
 
 		static void Main(string[] args)
 		{
@@ -46,7 +46,7 @@ namespace BuildReleaseVersion
 		{
 			while (true)
 			{
-				if(filesQueue.Count>0 && single.WaitOne())
+				if(filesQueue.Count > 0) //&& single.WaitOne())
 				{
 					ChangeVersionVisitor version = new ChangeVersionVisitor(verNum);
 
@@ -81,7 +81,7 @@ namespace BuildReleaseVersion
 			{
 				// enqueue null to tell stop the consumer.
 				filesQueue.Enqueue(null);
-				single.Set();
+				//single.Set();
 			}
 		}
 
@@ -105,7 +105,7 @@ namespace BuildReleaseVersion
 				{
 					filesQueue.Enqueue(assemblyFile);
 					Utility.PrintFile(assemblyFile.filepath);
-					single.Set();
+					//single.Set();
 				}
 			}
 		}
