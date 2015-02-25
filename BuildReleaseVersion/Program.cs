@@ -27,7 +27,7 @@ namespace BuildReleaseVersion
 
 			string verNum = args[0];
 			string proLoc = args[1];
-			string proName = args[2] != null ? args[2] : string.Empty;
+			string proName = args.Length > 2 ? args[2] : string.Empty;
 
 			// Use single to create a Producer and Consumer to 
 			// handle the assemble files
@@ -56,7 +56,6 @@ namespace BuildReleaseVersion
 					// we need to break the while
 					if (file == null)
 					{
-						Console.WriteLine("Finished !");
 						break;
 					}
 					ThreadPool.QueueUserWorkItem(delegate
@@ -82,6 +81,7 @@ namespace BuildReleaseVersion
 			{
 				// enqueue null to tell stop the consumer.
 				filesQueue.Enqueue(null);
+				Console.WriteLine("Finished");
 				//single.Set();
 			}
 		}
