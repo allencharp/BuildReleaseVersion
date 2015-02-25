@@ -1,1 +1,0 @@
-C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\bin\Debug\BuildReleaseVersion.exe.config
