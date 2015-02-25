@@ -27,6 +27,7 @@ namespace BuildReleaseVersion
 
 			string verNum = args[0];
 			string proLoc = args[1];
+			string proName = args[2] != null ? args[2] : string.Empty;
 
 			// Use single to create a Producer and Consumer to 
 			// handle the assemble files
@@ -36,19 +37,19 @@ namespace BuildReleaseVersion
 			});
 			ThreadPool.QueueUserWorkItem(delegate 
 			{
-				HandleAssemlyFile(verNum);
+				HandleAssemlyFile(verNum, proName);
 			});
 
 			Console.ReadLine();
 		}
 		 
-		private static void HandleAssemlyFile(string verNum)
+		private static void HandleAssemlyFile(string verNum, string proName = "")
 		{
 			while (true)
 			{
 				if(filesQueue.Count > 0) //&& single.WaitOne())
 				{
-					ChangeVersionVisitor version = new ChangeVersionVisitor(verNum);
+					ChangeVersionVisitor version = new ChangeVersionVisitor(verNum, proName);
 
 					AssemblyFile file = filesQueue.Dequeue();
 
@@ -104,7 +105,6 @@ namespace BuildReleaseVersion
 				if (assemblyFile != null)
 				{
 					filesQueue.Enqueue(assemblyFile);
-					Utility.PrintFile(assemblyFile.filepath);
 					//single.Set();
 				}
 			}

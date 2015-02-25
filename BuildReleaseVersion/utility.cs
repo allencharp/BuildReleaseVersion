@@ -33,7 +33,7 @@ namespace BuildReleaseVersion
 		// Command: BuildReleaseVersion.exe 4.0.1001.2 C:\Source\ABSF
 		public static bool CheckArguments(string[] args)
 		{
-			if (args.Length != 2)
+			if (args.Length != 2 && args.Length != 3)
 			{
 				return false;
 			}
@@ -58,9 +58,10 @@ namespace BuildReleaseVersion
 			return string.Format("Beta Version {0} Beta1", version);
 		}
 
-		public static void ReplaceVersion(FileType type, string file, string repValue)
+		public static void ReplaceVersion(FileType type, string file, string repValue, string proName = "")
 		{
-			using (TextReader reader = new StreamReader(file))
+			bool changeFlag = false;
+			using (TextReader reader = new StreamReader(file, Encoding.ASCII))
 			{
 				string stream = reader.ReadToEnd();
 				
@@ -71,35 +72,44 @@ namespace BuildReleaseVersion
 					if (type == FileType.CommonAssemblyInfoCS && lines[i].Contains("AssemblyVersion"))
 					{
 						lines[i] = string.Format("[assembly: AssemblyVersion(\"{0}\")]", repValue);
+						changeFlag = true;
 					}
 					else if (type == FileType.CommonAssemblyInfoCS && lines[i].Contains("AssemblyFileVersion"))
 					{
 						lines[i] = string.Format("[assembly: AssemblyFileVersion(\"{0}\")]", repValue);
+						changeFlag = true;
 					}
 					else if (type == FileType.AssemblyInfoCpp && lines[i].Contains("AssemblyVersionAttribute"))
 					{
 						lines[i] = string.Format("[assembly:AssemblyVersionAttribute(\"{0}\")];", repValue);
+						changeFlag = true;
 					}
-					else if (type == FileType.CommonAssemblyInfoCS && lines[i].Contains("AssemblyTitle"))
+					else if (type == FileType.AssemblyInfoCS && proName != string.Empty && file.IndexOf(proName, 0, StringComparison.CurrentCultureIgnoreCase) != -1  && lines[i].Contains("AssemblyTitle"))
 					{
 						lines[i] = string.Format("[assembly: AssemblyTitle(\"{0}\")]", repValue);
+						changeFlag = true;
 					}
-					else if (type == FileType.CommonAssemblyInfoCS && lines[i].Contains("AssemblyDescription"))
+					else if (type == FileType.AssemblyInfoCS && proName != string.Empty && file.IndexOf(proName, 0, StringComparison.CurrentCultureIgnoreCase) != -1 && lines[i].Contains("AssemblyDescription"))
 					{
 						lines[i] = string.Format("[assembly: AssemblyDescription(\"{0}\")]", repValue);
+						changeFlag = true;
 					}
 				}
 				reader.Close();
 
-
-				using(TextWriter tw = new StreamWriter(file, false))
+				if (changeFlag)
 				{
-					for (int i = 0; i < lines.Length; i++)
+					Utility.PrintFile(file);
+
+					using (TextWriter tw = new StreamWriter(file, false, Encoding.ASCII))
 					{
-						tw.Write(lines[i]+"\n");
-					}
-					tw.Close();
-				};
+						for (int i = 0; i < lines.Length; i++)
+						{
+							tw.Write(lines[i] + "\n");
+						}
+						tw.Close();
+					};
+				}
 			}
 		}
 	}

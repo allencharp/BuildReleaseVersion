@@ -1,0 +1,6 @@
+C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\bin\Debug\BuildReleaseVersion.exe.config
+C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\bin\Debug\BuildReleaseVersion.exe
+C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\bin\Debug\BuildReleaseVersion.pdb
+C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\obj\Debug\BuildReleaseVersion.csprojResolveAssemblyReference.cache
+C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\obj\Debug\BuildReleaseVersion.exe
+C:\buildreleaseversion\BuildReleaseVersion\BuildReleaseVersion\obj\Debug\BuildReleaseVersion.pdb

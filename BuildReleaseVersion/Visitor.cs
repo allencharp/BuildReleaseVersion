@@ -16,9 +16,11 @@ namespace BuildReleaseVersion
 	class ChangeVersionVisitor : IVisitor
 	{
 		private string v;
-		public ChangeVersionVisitor(string version)
+		private string name;
+		public ChangeVersionVisitor(string version, string proName)
 		{
 			this.v = version;
+			this.name = proName;
 		}
 		public void ChangeAssemblyVersion(CSharpAssemblyFile file)
 		{
@@ -34,7 +36,7 @@ namespace BuildReleaseVersion
 		{
 			string beta = Utility.GetBetaInfo(this.v);
 
-			Utility.ReplaceVersion(FileType.AssemblyInfoCS, file.filepath, beta);
+			Utility.ReplaceVersion(FileType.AssemblyInfoCS, file.filepath, beta, this.name);
 		}
 	}
 }
