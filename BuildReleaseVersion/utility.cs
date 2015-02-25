@@ -84,12 +84,18 @@ namespace BuildReleaseVersion
 						lines[i] = string.Format("[assembly:AssemblyVersionAttribute(\"{0}\")];", repValue);
 						changeFlag = true;
 					}
-					else if (type == FileType.AssemblyInfoCS && proName != string.Empty && file.IndexOf(proName, 0, StringComparison.CurrentCultureIgnoreCase) != -1  && lines[i].Contains("AssemblyTitle"))
+					else if (type == FileType.AssemblyInfoCS && 
+						proName != string.Empty && 
+						file.IndexOf(proName, 0, StringComparison.CurrentCultureIgnoreCase) != -1  && 
+						lines[i].Contains("AssemblyTitle"))
 					{
 						lines[i] = string.Format("[assembly: AssemblyTitle(\"{0}\")]", repValue);
 						changeFlag = true;
 					}
-					else if (type == FileType.AssemblyInfoCS && proName != string.Empty && file.IndexOf(proName, 0, StringComparison.CurrentCultureIgnoreCase) != -1 && lines[i].Contains("AssemblyDescription"))
+					else if (type == FileType.AssemblyInfoCS && 
+						proName != string.Empty && 
+						file.IndexOf(proName, 0, StringComparison.CurrentCultureIgnoreCase) != -1 && 
+						lines[i].Contains("AssemblyDescription"))
 					{
 						lines[i] = string.Format("[assembly: AssemblyDescription(\"{0}\")]", repValue);
 						changeFlag = true;
